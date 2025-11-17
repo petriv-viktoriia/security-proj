@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Реєстрація</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+<div class="bg-white shadow-md rounded px-8 pt-6 pb-8 w-96">
+
+    <h2 class="text-2xl font-bold mb-4 text-center">Реєстрація</h2>
+
+    <form th:action="@{/register}" th:object="${user}" method="post">
+
+        <div th:if="${error}" class="mb-4 text-red-600 text-center">
+            <p th:text="${error}"></p>
+        </div>
+
+        <div class="mb-4">
+            <label class="block mb-2">Email</label>
+            <input type="email" th:field="*{email}" class="border rounded w-full py-2 px-3" />
+            <p class="text-red-500 text-sm" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+        </div>
+
+        <div class="mb-4">
+            <label class="block mb-2">Пароль</label>
+            <input type="password" th:field="*{password}" class="border rounded w-full py-2 px-3" />
+            <p class="text-red-500 text-sm" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+        </div>
+
+        <div class="mb-6">
+            <label class="block mb-2">Підтвердження паролю</label>
+            <input type="password" th:field="*{confirmPassword}" class="border rounded w-full py-2 px-3" />
+        </div>
+
+        <!-- тут з’явиться видимий чекбокс v2 -->
+        <div class="g-recaptcha" th:attr="data-sitekey=${recaptchaSiteKey}"></div>
+
+        <button type="submit"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full mt-4">
+            Зареєструватися
+        </button>
+    </form>
+</div>
+
+</body>
+</html>

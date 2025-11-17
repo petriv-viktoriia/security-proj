@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: security-project
+
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+recaptcha:
+  secretKey: ${RECAPTCHA_SECRET_KEY}
+  siteKey: ${RECAPTCHA_SITE_KEY}
+  url: https://www.google.com/recaptcha/api/siteverify
