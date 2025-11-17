@@ -32,7 +32,7 @@ public class User {
     @UpdateTimestamp
     private Instant updatedAt;
 
-//    private boolean enabled = false;
-//    private String activationToken;
-//    private Instant tokenExpiresAt;
+    private boolean enabled = false;
+    private String activationToken;
+    private Instant tokenExpiresAt;
 }

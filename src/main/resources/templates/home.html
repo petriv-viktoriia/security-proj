@@ -7,13 +7,11 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-<!-- Верхнє меню -->
 <header class="bg-blue-600 text-white p-4 flex justify-between items-center">
     <h1 class="text-xl font-bold">Мій Додаток</h1>
     <a th:href="@{/logout}" class="bg-red-500 px-4 py-2 rounded hover:bg-red-600 transition">Вийти</a>
 </header>
 
-<!-- Основний контент -->
 <main class="flex-grow flex flex-col justify-center items-center">
     <h2 class="text-3xl font-semibold mb-4">Ласкаво просимо!</h2>
     <p class="text-gray-700">Ви успішно увійшли в свій акаунт.</p>
@@ -22,7 +20,6 @@
     <p>Ваш пароль зберігається безпечно, <span th:text="${password}"></span></p>
 </main>
 
-<!-- Підвал -->
 <footer class="bg-gray-200 text-gray-700 p-4 text-center">
     © 2025 Мій Додаток. Всі права захищено.
 </footer>

@@ -21,12 +21,11 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // 2️⃣ DaoAuthenticationProvider
     @Bean
     public DaoAuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder); // перевірка хешів
+        authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
 
@@ -35,7 +34,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/login", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/register", "/login", "/css/**", "/js/**", "/activate").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
