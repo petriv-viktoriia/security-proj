@@ -20,11 +20,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}")
-    private String emailUsername;
-
-    @Value("${spring.mail.password}")
-    private String emailPassword;
+    private static final long PASSWORD_RESET_COOLDOWN_SECONDS = 60;
 
     public void registerUser(UserRegisterDto dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
@@ -64,8 +60,23 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Користувача з таким email не знайдено"));
 
+        // Перевірка, чи минула хвилина з останнього запиту
+        if (user.getLastPasswordReset() != null) {
+            Instant now = Instant.now();
+            Instant nextAllowedRequest = user.getLastPasswordReset()
+                    .plusSeconds(PASSWORD_RESET_COOLDOWN_SECONDS);
+
+            if (now.isBefore(nextAllowedRequest)) {
+                long secondsRemaining = nextAllowedRequest.getEpochSecond() - now.getEpochSecond();
+                throw new IllegalArgumentException(
+                        "Ви можете надіслати новий запит через " + secondsRemaining + " секунд"
+                );
+            }
+        }
+
         user.setResetPasswordToken(UUID.randomUUID().toString());
         user.setResetPasswordTokenExpiresAt(Instant.now().plusSeconds(3600));
+        user.setLastPasswordReset(Instant.now());
 
         userRepository.save(user);
 
