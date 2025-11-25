@@ -99,4 +99,51 @@ public class UserController {
         model.addAttribute("message", "Акаунт успішно активовано! Можете увійти.");
         return "activation-result";
     }
+
+    @GetMapping("/forgot-password")
+    public String showForgotPasswordForm() {
+        return "forgot-password";
+    }
+
+    @PostMapping("/forgot-password")
+    public String processForgotPassword(@RequestParam("email") String email, Model model) {
+        try {
+            userService.sendPasswordResetEmail(email);
+            model.addAttribute("message", "Посилання на відновлення пароля відправлено на вашу електронну пошту");
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("error", ex.getMessage());
+        }
+        return "forgot-password";
+    }
+
+    @GetMapping("/reset-password")
+    public String showResetPasswordForm(@RequestParam("token") String token, Model model) {
+        model.addAttribute("token", token);
+        return "reset-password";
+    }
+
+    @PostMapping("/reset-password")
+    public String processResetPassword(
+            @RequestParam("token") String token,
+            @RequestParam("password") String password,
+            @RequestParam("confirmPassword") String confirmPassword,
+            Model model
+    ) {
+        if (!password.equals(confirmPassword)) {
+            model.addAttribute("error", "Паролі не співпадають");
+            model.addAttribute("token", token);
+            return "reset-password";
+        }
+
+        try {
+            userService.resetPassword(token, password);
+            model.addAttribute("message", "Пароль успішно змінено! Можете увійти за посиланням нижче.");
+            model.addAttribute("token", token);
+            return "reset-password";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("token", token);
+            return "reset-password";
+        }
+    }
 }

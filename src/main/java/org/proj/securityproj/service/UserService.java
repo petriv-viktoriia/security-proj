@@ -48,12 +48,6 @@ public class UserService {
     }
 
     private void sendActivationEmail(User user) {
-        System.out.println("EMAIL_USERNAME: " + emailUsername);
-        System.out.println("EMAIL_PASSWORD length: " +
-                (emailPassword != null ? emailPassword.length() : "null"));
-        System.out.println("EMAIL_PASSWORD (masked): " +
-                (emailPassword != null ? emailPassword.substring(0, 4) + "..." : "null"));
-
         String activationLink = "http://localhost:5173/activate?token=" + user.getActivationToken();
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
@@ -64,5 +58,41 @@ public class UserService {
                 + "\n\nЦе посилання дійсне 24 години.");
 
         mailSender.send(mailMessage);
+    }
+
+    public void sendPasswordResetEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Користувача з таким email не знайдено"));
+
+        user.setResetPasswordToken(UUID.randomUUID().toString());
+        user.setResetPasswordTokenExpiresAt(Instant.now().plusSeconds(3600));
+
+        userRepository.save(user);
+
+        String resetLink = "http://localhost:5173/reset-password?token=" + user.getResetPasswordToken();
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject("Відновлення пароля");
+        message.setText("Перейдіть за посиланням, щоб відновити пароль:\n" +
+                resetLink +
+                "\nПосилання дійсне 1 годину.");
+
+        mailSender.send(message);
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        User user = userRepository.findByResetPasswordToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Невірний токен"));
+
+        if (user.getResetPasswordTokenExpiresAt().isBefore(Instant.now())) {
+            throw new IllegalArgumentException("Токен прострочено");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetPasswordToken(null);
+        user.setResetPasswordTokenExpiresAt(null);
+
+        userRepository.save(user);
     }
 }

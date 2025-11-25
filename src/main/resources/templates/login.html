@@ -13,8 +13,16 @@
         Неправильний email або пароль
     </div>
 
+    <div th:if="${param.notActivated}" class="bg-red-100 text-red-700 p-2 mb-4 rounded">
+        Ваш акаунт не активований. Перевірте електронну пошту.
+    </div>
+
     <div th:if="${param.registered}" class="bg-green-100 text-green-700 p-2 mb-4 rounded">
         Реєстрація пройшла успішно! Будь ласка, увійдіть.
+    </div>
+
+    <div th:if="${param.passwordChanged}" class="bg-green-100 text-green-700 p-2 mb-4 rounded">
+        Пароль успішно змінено! Тепер можете увійти.
     </div>
 
     <form th:action="@{/login}" method="post" class="space-y-4">
@@ -28,6 +36,13 @@
             <label for="password" class="block text-gray-700">Пароль</label>
             <input type="password" name="password" id="password"
                    class="w-full p-2 border border-gray-300 rounded mt-1" required>
+        </div>
+
+        <div class="text-right">
+            <a th:href="@{/forgot-password}"
+               class="text-blue-500 text-sm hover:underline">
+                Забули пароль?
+            </a>
         </div>
 
         <button type="submit"

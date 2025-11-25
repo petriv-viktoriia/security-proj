@@ -35,4 +35,8 @@ public class User {
     private boolean enabled = false;
     private String activationToken;
     private Instant tokenExpiresAt;
+
+    private String resetPasswordToken;
+    private Instant resetPasswordTokenExpiresAt;
+    private Instant lastPasswordReset;
 }
