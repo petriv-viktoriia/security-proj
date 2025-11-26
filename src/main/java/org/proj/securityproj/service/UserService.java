@@ -2,6 +2,7 @@ package org.proj.securityproj.service;
 
 import lombok.RequiredArgsConstructor;
 import org.proj.securityproj.dto.UserRegisterDto;
+import org.proj.securityproj.entity.Role;
 import org.proj.securityproj.entity.User;
 import org.proj.securityproj.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,13 +39,22 @@ public class UserService {
         user.setActivationToken(UUID.randomUUID().toString());
         user.setTokenExpiresAt(Instant.now().plusSeconds(24 * 3600));
         user.setEnabled(false);
+        user.setRole(Role.USER);
 
         userRepository.save(user);
         sendActivationEmail(user);
     }
 
+    public void assignAdminRole(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Користувача не знайдено"));
+
+        user.setRole(Role.ADMIN);
+        userRepository.save(user);
+    }
+
     private void sendActivationEmail(User user) {
-        String activationLink = "http://localhost:5173/activate?token=" + user.getActivationToken();
+        String activationLink = "http://localhost:8080/activate?token=" + user.getActivationToken();
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
@@ -80,7 +90,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        String resetLink = "http://localhost:5173/reset-password?token=" + user.getResetPasswordToken();
+        String resetLink = "http://localhost:8080/reset-password?token=" + user.getResetPasswordToken();
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());

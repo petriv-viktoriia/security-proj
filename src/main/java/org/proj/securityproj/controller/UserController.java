@@ -74,10 +74,13 @@ public class UserController {
         return "login";
     }
 
-    @GetMapping
+    @GetMapping("/")
     public String home(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+
         model.addAttribute("email", userDetails.getUsername());
-        model.addAttribute("password", userDetails.getPassword());
         return "home";
     }
 
@@ -145,5 +148,10 @@ public class UserController {
             model.addAttribute("token", token);
             return "reset-password";
         }
+    }
+
+    @GetMapping("/access-denied")
+    public String accessDenied() {
+        return "access-denied";
     }
 }

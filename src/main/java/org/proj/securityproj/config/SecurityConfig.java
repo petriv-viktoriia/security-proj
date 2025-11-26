@@ -1,7 +1,10 @@
 package org.proj.securityproj.config;
 
 import lombok.RequiredArgsConstructor;
+import org.proj.securityproj.service.CustomAuthenticationHandler;
+import org.proj.securityproj.service.CustomOAuth2UserService;
 import org.proj.securityproj.service.CustomUserDetailsService;
+import org.proj.securityproj.service.OAuth2LoginFailureHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -15,6 +18,9 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
+    private final CustomAuthenticationHandler customAuthenticationHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -35,14 +41,29 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/register", "/login", "/css/**", "/js/**", "/activate", "/forgot-password", "/reset-password").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .usernameParameter("email")
                         .passwordParameter("password")
+                        .successHandler(customAuthenticationHandler)
+                        .failureHandler(customAuthenticationHandler)
                         .defaultSuccessUrl("/", true)
                         .permitAll()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
+                        .defaultSuccessUrl("/", true)
+                        .failureHandler(oAuth2LoginFailureHandler)
+                        .authorizationEndpoint(authorization ->
+                                authorization.baseUri("/oauth2/authorization"))
+                        .redirectionEndpoint(redirection ->
+                                redirection.baseUri("/login/oauth2/code/*"))
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")

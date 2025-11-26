@@ -24,6 +24,14 @@ spring:
           auth: true
           starttls:
             enable: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: ${OAUTH_CLIENT_ID}
+            clientSecret: ${OAUTH_CLIENT_SECRET}
+            scope: profile, email
 
 recaptcha:
   secretKey: ${RECAPTCHA_SECRET_KEY}

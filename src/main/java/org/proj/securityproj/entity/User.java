@@ -1,11 +1,6 @@
 package org.proj.securityproj.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -39,4 +34,17 @@ public class User {
     private String resetPasswordToken;
     private Instant resetPasswordTokenExpiresAt;
     private Instant lastPasswordReset;
+
+    @Column(name = "oauth_access_token", length = 2048)
+    private String oauthAccessToken;
+
+    private Instant oauthTokenExpiresAt;
+
+    private int failedLoginAttempts = 0;
+    private Instant accountLockedUntil;
+    private boolean accountLocked = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
 }

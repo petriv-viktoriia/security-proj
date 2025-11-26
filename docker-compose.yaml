@@ -16,7 +16,7 @@ services:
     build: .
     container_name: security_app
     ports:
-      - "5173:8080"
+      - "8080:8080"
     depends_on:
       - security_db
     environment:
@@ -28,6 +28,8 @@ services:
       RECAPTCHA_SITE_KEY: ${RECAPTCHA_SITE_KEY}
       EMAIL_USERNAME: ${EMAIL_USERNAME}
       EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID}
+      OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET}
     networks:
       - security_network
 
