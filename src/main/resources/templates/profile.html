@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Профіль користувача</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+<header class="bg-blue-600 text-white p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold">Мій Профіль</h1>
+    <div class="space-x-2">
+        <a th:href="@{/}" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-700 transition">Головна</a>
+        <a th:href="@{/logout}" class="bg-red-500 px-4 py-2 rounded hover:bg-red-600 transition">Вийти</a>
+    </div>
+</header>
+
+<main class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+
+        <div th:if="${message}" class="bg-green-100 text-green-700 p-4 rounded mb-4">
+            <p th:text="${message}"></p>
+        </div>
+
+        <div th:if="${error}" class="bg-red-100 text-red-700 p-4 rounded mb-4">
+            <p th:text="${error}"></p>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-4">Інформація про акаунт</h2>
+            <div class="space-y-2">
+                <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+                <p><strong>Роль:</strong> <span th:text="${user.role}"></span></p>
+                <p><strong>Дата реєстрації:</strong>
+                    <span th:text="${#temporals.format(user.createdAt, 'dd.MM.yyyy HH:mm')}"></span>
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4">Двохфакторна аутентифікація (2FA)</h2>
+
+            <div th:if="${!twoFactorEnabled}" class="space-y-4">
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
+                    <p class="text-blue-700">
+                        <strong>Підвищте безпеку свого акаунта!</strong><br>
+                        Увімкніть двохфакторну аутентифікацію для додаткового захисту.
+                    </p>
+                </div>
+
+                <p class="text-gray-700">
+                    2FA додає додатковий рівень безпеки, вимагаючи код з вашого телефону
+                    при кожному вході в акаунт.
+                </p>
+
+                <a th:href="@{/profile/2fa/setup}"
+                   class="inline-block bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition">
+                    Увімкнути 2FA
+                </a>
+            </div>
+
+            <div th:if="${twoFactorEnabled}" class="space-y-4">
+                <div class="bg-green-50 border-l-4 border-green-500 p-4">
+                    <p class="text-green-700">
+                        <strong>✓ 2FA увімкнено</strong><br>
+                        Ваш акаунт захищено двохфакторною аутентифікацією.
+                    </p>
+                </div>
+
+                <div class="bg-white border border-gray-300 rounded p-4">
+                    <h3 class="font-bold mb-2">Вимкнути 2FA</h3>
+                    <p class="text-gray-600 text-sm mb-4">
+                        Введіть код з додатку аутентифікатора або використайте резервний код
+                    </p>
+
+                    <form th:action="@{/profile/2fa/disable}" method="post" id="mainCodeForm" class="space-y-3">
+                        <input type="hidden" name="useBackupCode" value="false">
+
+                        <label class="block text-sm font-medium text-gray-700">Код аутентифікації</label>
+                        <input type="text"
+                               name="code"
+                               placeholder="Введіть 6-значний код"
+                               class="border rounded w-full py-2 px-3"
+                               pattern="[0-9]{6}"
+                               maxlength="6"
+                               required>
+
+                        <button type="submit"
+                                class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition w-full"
+                                onclick="return confirm('Ви впевнені, що хочете вимкнути 2FA?')">
+                            Вимкнути 2FA
+                        </button>
+                    </form>
+
+                    <div class="relative my-4">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500">Або</span>
+                        </div>
+                    </div>
+
+                    <button type="button"
+                            onclick="toggleBackupCodeForm()"
+                            class="w-full text-blue-600 hover:text-blue-700 text-sm font-medium py-2">
+                        Використати резервний код
+                    </button>
+
+                    <form th:action="@{/profile/2fa/disable}"
+                          method="post"
+                          id="backupCodeForm"
+                          style="display: none;"
+                          class="mt-4 space-y-3">
+                        <input type="hidden" name="useBackupCode" value="true">
+
+                        <label class="block text-sm font-medium text-gray-700">Резервний код</label>
+                        <input type="text"
+                               name="code"
+                               placeholder="Введіть резервний код"
+                               class="border rounded w-full py-2 px-3"
+                               pattern="[0-9]{6}"
+                               maxlength="6">
+
+                        <div class="flex space-x-2">
+                            <button type="submit"
+                                    class="flex-1 bg-red-600 text-white py-2 rounded hover:bg-red-700 transition"
+                                    onclick="return confirm('Ви впевнені, що хочете вимкнути 2FA?')">
+                                Вимкнути 2FA
+                            </button>
+                            <button type="button"
+                                    onclick="toggleBackupCodeForm()"
+                                    class="flex-1 bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400 transition">
+                                Скасувати
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-3">
+                        <p class="text-sm text-yellow-700">
+                            <strong>Підказка:</strong> Резервні коди можна використати лише один раз.
+                            Після використання коду він буде видалений.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="bg-gray-200 text-gray-700 p-4 text-center mt-8">
+    © 2025 Мій Додаток. Всі права захищено.
+</footer>
+
+<script>
+    function toggleBackupCodeForm() {
+        const mainForm = document.getElementById('mainCodeForm');
+        const backupForm = document.getElementById('backupCodeForm');
+
+        if (backupForm.style.display === 'none') {
+            mainForm.style.display = 'none';
+            backupForm.style.display = 'block';
+            backupForm.querySelector('input[name="code"]').focus();
+        } else {
+            mainForm.style.display = 'block';
+            backupForm.style.display = 'none';
+            mainForm.querySelector('input[name="code"]').focus();
+        }
+    }
+</script>
+
+</body>
+</html>

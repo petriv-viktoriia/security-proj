@@ -1,10 +1,7 @@
 package org.proj.securityproj.config;
 
 import lombok.RequiredArgsConstructor;
-import org.proj.securityproj.service.CustomAuthenticationHandler;
-import org.proj.securityproj.service.CustomOAuth2UserService;
-import org.proj.securityproj.service.CustomUserDetailsService;
-import org.proj.securityproj.service.OAuth2LoginFailureHandler;
+import org.proj.securityproj.service.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -21,6 +18,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CustomAuthenticationHandler customAuthenticationHandler;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -40,8 +38,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/login", "/css/**", "/js/**", "/activate", "/forgot-password", "/reset-password").permitAll()
+                        .requestMatchers("/register", "/login", "/css/**", "/js/**", "/activate", "/forgot-password", "/reset-password", "/2fa/verify").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/profile/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -50,7 +49,6 @@ public class SecurityConfig {
                         .passwordParameter("password")
                         .successHandler(customAuthenticationHandler)
                         .failureHandler(customAuthenticationHandler)
-                        .defaultSuccessUrl("/", true)
                         .permitAll()
                 )
                 .oauth2Login(oauth2 -> oauth2
@@ -58,7 +56,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
                         )
-                        .defaultSuccessUrl("/", true)
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
                         .authorizationEndpoint(authorization ->
                                 authorization.baseUri("/oauth2/authorization"))

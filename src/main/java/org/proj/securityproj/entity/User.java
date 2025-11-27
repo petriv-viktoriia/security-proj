@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -47,4 +49,15 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.USER;
+
+    @Column(name = "two_factor_enabled")
+    private boolean twoFactorEnabled = false;
+
+    @Column(name = "two_factor_secret")
+    private String twoFactorSecret;
+
+    @ElementCollection
+    @CollectionTable(name = "user_backup_codes", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "backup_code")
+    private List<String> backupCodes = new ArrayList<>();
 }

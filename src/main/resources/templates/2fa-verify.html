@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Підтвердження входу</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+<div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+    <div class="text-center mb-6">
+        <div class="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold">Двохфакторна аутентифікація</h2>
+        <p class="text-gray-600 mt-2">Для завершення входу введіть код з додатку аутентифікатора</p>
+    </div>
+
+    <div th:if="${error}" class="bg-red-100 text-red-700 p-3 rounded mb-4">
+        <p th:text="${error}"></p>
+    </div>
+
+    <form th:action="@{/2fa/verify}" method="post" id="normalCodeForm">
+        <input type="hidden" name="useBackupCode" value="false">
+
+        <label class="block text-gray-700 font-medium mb-2">Код аутентифікації</label>
+        <input type="text"
+               name="code"
+               id="authCode"
+               placeholder="000000"
+               class="border rounded w-full py-3 px-4 text-center text-2xl tracking-widest mb-4"
+               pattern="[0-9]{6}"
+               maxlength="6"
+               autofocus
+               required>
+
+        <button type="submit"
+                class="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition mb-4">
+            Підтвердити
+        </button>
+    </form>
+
+    <div class="relative my-6">
+        <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white text-gray-500">Або</span>
+        </div>
+    </div>
+
+    <button type="button"
+            onclick="toggleBackupCodeForm()"
+            class="w-full text-blue-600 hover:text-blue-700 text-sm font-medium">
+        Використати резервний код
+    </button>
+
+    <form th:action="@{/2fa/verify}"
+          method="post"
+          id="backupCodeForm"
+          style="display: none;"
+          class="mt-4">
+        <input type="hidden" name="useBackupCode" value="true">
+
+        <label class="block text-gray-700 font-medium mb-2">Резервний код</label>
+        <input type="text"
+               name="code"
+               placeholder="Введіть резервний код"
+               class="border rounded w-full py-3 px-4 text-center mb-4"
+               pattern="[0-9]{6}"
+               maxlength="6">
+
+        <div class="flex space-x-2">
+            <button type="submit"
+                    class="flex-1 bg-green-600 text-white py-2 rounded hover:bg-green-700 transition">
+                Підтвердити
+            </button>
+            <button type="button"
+                    onclick="toggleBackupCodeForm()"
+                    class="flex-1 bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400 transition">
+                Скасувати
+            </button>
+        </div>
+    </form>
+
+    <div class="mt-6 text-center">
+        <a th:href="@{/logout}" class="text-red-600 hover:underline text-sm">
+            Скасувати вхід
+        </a>
+    </div>
+
+    <div class="mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
+        <p class="text-sm text-yellow-700">
+            <strong>Підказка:</strong> Якщо у вас немає доступу до додатку аутентифікатора,
+            використайте один з резервних кодів, які ви зберегли при налаштуванні 2FA.
+        </p>
+    </div>
+</div>
+
+<script>
+    function toggleBackupCodeForm() {
+        const normalForm = document.getElementById('normalCodeForm');
+        const backupForm = document.getElementById('backupCodeForm');
+
+        if (backupForm.style.display === 'none') {
+            normalForm.style.display = 'none';
+            backupForm.style.display = 'block';
+            backupForm.querySelector('input[name="code"]').focus();
+        } else {
+            normalForm.style.display = 'block';
+            backupForm.style.display = 'none';
+            normalForm.querySelector('input[name="code"]').focus();
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -70,7 +70,6 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Користувача з таким email не знайдено"));
 
-        // Перевірка, чи минула хвилина з останнього запиту
         if (user.getLastPasswordReset() != null) {
             Instant now = Instant.now();
             Instant nextAllowedRequest = user.getLastPasswordReset()

@@ -54,8 +54,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         userRepository.save(user);
-
-        // Повертаємо кастомного OAuth2User
         return new CustomOAuth2User(oauth2User, user.getEmail(), user.getPassword(), user.getRole());
     }
 }

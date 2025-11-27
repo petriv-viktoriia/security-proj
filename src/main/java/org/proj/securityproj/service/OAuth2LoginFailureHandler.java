@@ -20,11 +20,9 @@ public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
 
         String errorMessage = "oauth_error";
 
-        // Перевіряємо, чи це OAuth2AuthenticationException
         if (exception instanceof OAuth2AuthenticationException oauth2Exception) {
             String errorCode = oauth2Exception.getError().getErrorCode();
 
-            // Отримуємо детальне повідомлення
             if ("user_not_found".equals(errorCode)) {
                 errorMessage = "user_not_found";
             } else if ("user_not_activated".equals(errorCode)) {

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Резервні коди 2FA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+<div class="bg-white shadow-md rounded-lg p-8 max-w-lg w-full">
+    <div class="text-center mb-6">
+        <div class="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-green-600">2FA успішно увімкнено!</h2>
+    </div>
+
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        <p class="text-yellow-800 font-bold mb-2">⚠️ Важливо!</p>
+        <p class="text-sm text-yellow-700">
+            Збережіть ці резервні коди в безпечному місці. Кожен код можна використати лише один раз
+            для входу в акаунт, якщо у вас немає доступу до додатку аутентифікатора.
+        </p>
+    </div>
+
+    <div class="mb-6">
+        <h3 class="font-bold mb-3">Ваші резервні коди:</h3>
+        <div class="bg-gray-50 border border-gray-300 rounded p-4">
+            <div class="grid grid-cols-2 gap-3" id="backupCodes">
+                <div th:each="code : ${backupCodes}"
+                     class="bg-white border border-gray-200 rounded p-2 text-center font-mono text-lg">
+                    <span th:text="${code}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex space-x-3 mb-6">
+        <button onclick="copyToClipboard()"
+                class="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
+            📋 Копіювати всі
+        </button>
+        <button onclick="downloadCodes()"
+                class="flex-1 bg-green-600 text-white py-2 rounded hover:bg-green-700 transition">
+            💾 Завантажити
+        </button>
+    </div>
+
+    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+        <p class="text-sm text-red-700">
+            <strong>Увага:</strong> Ці коди більше не будуть показані.
+            Переконайтеся, що ви їх зберегли перед тим, як продовжити.
+        </p>
+    </div>
+
+    <div class="text-center">
+        <a th:href="@{/profile}"
+           class="inline-block bg-gray-600 text-white px-6 py-3 rounded hover:bg-gray-700 transition">
+            Повернутися до профілю
+        </a>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const backupCodes = /*[[${backupCodes}]]*/ [];
+
+    function copyToClipboard() {
+        const text = backupCodes.join('\n');
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Резервні коди скопійовано в буфер обміну!');
+        }).catch(err => {
+            console.error('Помилка копіювання:', err);
+        });
+    }
+
+    function downloadCodes() {
+        const text = '2FA Резервні коди\n' +
+            '==================\n\n' +
+            backupCodes.join('\n') +
+            '\n\nЗбережіть ці коди в безпечному місці!\n' +
+            'Кожен код можна використати лише один раз.';
+
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '2fa-backup-codes.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
+</script>
+
+</body>
+</html>

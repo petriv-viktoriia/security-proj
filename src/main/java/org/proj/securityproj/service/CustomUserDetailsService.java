@@ -28,7 +28,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user.isAccountLocked() && user.getAccountLockedUntil() != null) {
             accountNonLocked = Instant.now().isAfter(user.getAccountLockedUntil());
 
-            // Якщо час блокування минув, розблокувати
             if (accountNonLocked) {
                 user.setAccountLocked(false);
                 user.setAccountLockedUntil(null);

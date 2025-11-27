@@ -22,7 +22,6 @@ public class LoginAttemptService {
 
     @Transactional
     public void recordSuccessfulLogin(String email, HttpServletRequest request) {
-        // Логування успішної спроби
         LoginAttempt attempt = new LoginAttempt();
         attempt.setEmail(email);
         attempt.setIpAddress(getClientIP(request));
@@ -30,7 +29,6 @@ public class LoginAttemptService {
         attempt.setUserAgent(request.getHeader("User-Agent"));
         loginAttemptRepository.save(attempt);
 
-        // Скидання лічильника невдалих спроб
         userRepository.findByEmail(email).ifPresent(user -> {
             if (user.getFailedLoginAttempts() > 0) {
                 user.setFailedLoginAttempts(0);
@@ -43,9 +41,6 @@ public class LoginAttemptService {
 
     @Transactional
     public void recordFailedLogin(String email, String reason, HttpServletRequest request) {
-        System.out.println("=== Recording failed login for: " + email + " ===");
-
-        // Логування невдалої спроби
         LoginAttempt attempt = new LoginAttempt();
         attempt.setEmail(email);
         attempt.setIpAddress(getClientIP(request));
@@ -54,12 +49,10 @@ public class LoginAttemptService {
         attempt.setUserAgent(request.getHeader("User-Agent"));
         loginAttemptRepository.save(attempt);
 
-        // Збільшення лічильника невдалих спроб
         userRepository.findByEmail(email).ifPresent(user -> {
             int attempts = user.getFailedLoginAttempts() + 1;
             user.setFailedLoginAttempts(attempts);
 
-            System.out.println("Failed attempts count: " + attempts);
 
             if (attempts >= MAX_FAILED_ATTEMPTS) {
                 user.setAccountLocked(true);
@@ -68,7 +61,6 @@ public class LoginAttemptService {
             }
 
             userRepository.save(user);
-            System.out.println("User saved with " + user.getFailedLoginAttempts() + " failed attempts");
         });
     }
 
@@ -76,10 +68,8 @@ public class LoginAttemptService {
         return userRepository.findByEmail(email)
                 .map(user -> {
                     if (user.isAccountLocked()) {
-                        // Перевірка, чи минув час блокування
                         if (user.getAccountLockedUntil() != null &&
                                 Instant.now().isAfter(user.getAccountLockedUntil())) {
-                            // Розблокувати акаунт
                             user.setAccountLocked(false);
                             user.setAccountLockedUntil(null);
                             user.setFailedLoginAttempts(0);

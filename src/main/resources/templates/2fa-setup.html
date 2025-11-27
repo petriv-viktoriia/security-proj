@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Налаштування 2FA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+<div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+    <h2 class="text-2xl font-bold mb-6 text-center">Налаштування 2FA</h2>
+
+    <div th:if="${error}" class="bg-red-100 text-red-700 p-3 rounded mb-4">
+        <p th:text="${error}"></p>
+    </div>
+
+    <div class="space-y-6">
+        <div class="border-b pb-4">
+            <h3 class="font-bold text-lg mb-2">Крок 1: Встановіть додаток</h3>
+            <p class="text-gray-600 text-sm">
+                Завантажте один з цих додатків на свій телефон:
+            </p>
+            <ul class="list-disc list-inside text-sm text-gray-600 mt-2">
+                <li>Google Authenticator</li>
+                <li>Microsoft Authenticator</li>
+                <li>Authy</li>
+            </ul>
+        </div>
+
+        <div class="border-b pb-4">
+            <h3 class="font-bold text-lg mb-3">Крок 2: Скануйте QR код</h3>
+            <div class="flex justify-center mb-4">
+                <img th:src="${qrCode}"
+                     alt="QR Code"
+                     class="border-2 border-gray-300 rounded p-2"
+                     style="width: 250px; height: 250px;">
+            </div>
+
+            <div class="bg-gray-50 p-3 rounded">
+                <p class="text-xs text-gray-600 mb-1">Або введіть код вручну:</p>
+                <code class="bg-gray-200 px-2 py-1 rounded text-sm break-all" th:text="${secret}"></code>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="font-bold text-lg mb-3">Крок 3: Підтвердіть налаштування</h3>
+            <p class="text-gray-600 text-sm mb-3">
+                Введіть 6-значний код з додатку аутентифікатора:
+            </p>
+
+            <form th:action="@{/profile/2fa/enable}" method="post">
+                <input type="text"
+                       name="code"
+                       placeholder="000000"
+                       class="border rounded w-full py-2 px-3 text-center text-2xl tracking-widest mb-4"
+                       pattern="[0-9]{6}"
+                       maxlength="6"
+                       autofocus
+                       required>
+
+                <button type="submit"
+                        class="w-full bg-green-600 text-white py-3 rounded hover:bg-green-700 transition">
+                    Підтвердити та увімкнути 2FA
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="mt-6 text-center">
+        <a th:href="@{/profile}" class="text-blue-600 hover:underline text-sm">
+            ← Повернутися до профілю
+        </a>
+    </div>
+</div>
+
+</body>
+</html>
