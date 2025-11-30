@@ -18,7 +18,7 @@ public class LoginAttemptService {
     private final UserRepository userRepository;
 
     private static final int MAX_FAILED_ATTEMPTS = 5;
-    private static final long LOCK_TIME_DURATION_MINUTES = 15;
+    private static final long LOCK_TIME_DURATION_MINUTES = 1;
 
     @Transactional
     public void recordSuccessfulLogin(String email, HttpServletRequest request) {

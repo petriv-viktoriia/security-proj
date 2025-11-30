@@ -5,7 +5,6 @@ import org.proj.securityproj.dto.UserRegisterDto;
 import org.proj.securityproj.entity.Role;
 import org.proj.securityproj.entity.User;
 import org.proj.securityproj.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -12,6 +12,11 @@
     <div class="space-x-2">
         <a th:href="@{/}" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-700 transition">Головна</a>
         <a th:href="@{/logout}" class="bg-red-500 px-4 py-2 rounded hover:bg-red-600 transition">Вийти</a>
+        <a th:if="${isAdmin}"
+           th:href="@{/admin/login-attempts}"
+           class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition">
+            Адмін-сторінка
+        </a>
     </div>
 </header>
 

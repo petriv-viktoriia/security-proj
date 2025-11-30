@@ -5,6 +5,20 @@
     <title>Реєстрація</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script>
+        function togglePassword(inputId, iconId) {
+            var passwordField = document.getElementById(inputId);
+            var passwordIcon = document.getElementById(iconId);
+
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                passwordIcon.src = "https://img.icons8.com/ios/452/visible.png";
+            } else {
+                passwordField.type = "password";
+                passwordIcon.src = "https://img.icons8.com/ios/452/invisible.png";
+            }
+        }
+    </script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
 
@@ -26,13 +40,23 @@
 
         <div class="mb-4">
             <label class="block mb-2">Пароль</label>
-            <input type="password" th:field="*{password}" class="border rounded w-full py-2 px-3" />
+            <div class="flex items-center border rounded">
+                <input type="password" th:field="*{password}" id="password" class="border-none rounded-l w-full py-2 px-3" />
+                <button type="button" onclick="togglePassword('password', 'password-icon')" class="py-2 px-4 bg-gray-200 text-gray-600 rounded-r">
+                    <img id="password-icon" src="https://img.icons8.com/ios/452/invisible.png" alt="Toggle visibility" class="w-6 h-6">
+                </button>
+            </div>
             <p class="text-red-500 text-sm" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
         </div>
 
         <div class="mb-6">
             <label class="block mb-2">Підтвердження паролю</label>
-            <input type="password" th:field="*{confirmPassword}" class="border rounded w-full py-2 px-3" />
+            <div class="flex items-center border rounded">
+                <input type="password" th:field="*{confirmPassword}" id="confirmPassword" class="border-none rounded-l w-full py-2 px-3" />
+                <button type="button" onclick="togglePassword('confirmPassword', 'confirm-password-icon')" class="py-2 px-4 bg-gray-200 text-gray-600 rounded-r">
+                    <img id="confirm-password-icon" src="https://img.icons8.com/ios/452/invisible.png" alt="Toggle visibility" class="w-6 h-6">
+                </button>
+            </div>
         </div>
 
         <div class="g-recaptcha" th:attr="data-sitekey=${recaptchaSiteKey}"></div>

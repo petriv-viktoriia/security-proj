@@ -1,6 +1,7 @@
 package org.proj.securityproj.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.proj.securityproj.entity.Role;
 import org.proj.securityproj.entity.User;
 import org.proj.securityproj.repository.UserRepository;
 import org.proj.securityproj.service.TwoFactorAuthService;
@@ -8,7 +9,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -28,7 +32,7 @@ public class ProfileController {
 
         model.addAttribute("user", user);
         model.addAttribute("twoFactorEnabled", user.isTwoFactorEnabled());
-
+        model.addAttribute("isAdmin", user.getRole().equals(Role.ADMIN));
         return "profile";
     }
 

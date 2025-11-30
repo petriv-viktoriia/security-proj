@@ -1,7 +1,11 @@
 package org.proj.securityproj.config;
 
 import lombok.RequiredArgsConstructor;
-import org.proj.securityproj.service.*;
+import org.proj.securityproj.service.CustomAuthenticationHandler;
+import org.proj.securityproj.service.CustomOAuth2UserService;
+import org.proj.securityproj.service.CustomUserDetailsService;
+import org.proj.securityproj.service.OAuth2AuthenticationSuccessHandler;
+import org.proj.securityproj.service.OAuth2LoginFailureHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;

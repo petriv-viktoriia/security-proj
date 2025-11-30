@@ -1,7 +1,6 @@
 package org.proj.securityproj.service;
 
 import lombok.RequiredArgsConstructor;
-import org.proj.securityproj.dto.CustomUserDetails;
 import org.proj.securityproj.entity.User;
 import org.proj.securityproj.repository.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

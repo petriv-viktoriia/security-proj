@@ -6,6 +6,7 @@ import org.proj.securityproj.dto.UserRegisterDto;
 import org.proj.securityproj.entity.User;
 import org.proj.securityproj.repository.UserRepository;
 import org.proj.securityproj.service.CaptchaService;
+import org.proj.securityproj.service.LoginAttemptService;
 import org.proj.securityproj.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,6 +29,7 @@ public class UserController {
     private final UserService userService;
     private final CaptchaService captchaService;
     private final UserRepository userRepository;
+    private final LoginAttemptService loginAttemptService;
 
     @Value("${recaptcha.siteKey}")
     private String recaptchaSiteKey;
@@ -69,8 +71,32 @@ public class UserController {
     }
 
     @GetMapping("/login")
-    public String showLoginForm(Model model) {
-        model.addAttribute("error", "");
+    public String showLoginForm(
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "lockedUntil", required = false) Long lockedUntilParam,
+            @RequestParam(value = "error", required = false) String error,
+            Model model
+    ) {
+        if (email != null) {
+            model.addAttribute("email", email);
+        }
+
+        if (error != null) {
+            model.addAttribute("error", error);
+        }
+
+        if (lockedUntilParam != null && lockedUntilParam > System.currentTimeMillis()) {
+            model.addAttribute("lockedUntil", lockedUntilParam);
+            return "login";
+        }
+
+        if (email != null && loginAttemptService.isAccountLocked(email)) {
+            Instant until = loginAttemptService.getAccountLockedUntil(email);
+            if (until != null && until.toEpochMilli() > System.currentTimeMillis()) {
+                model.addAttribute("lockedUntil", until.toEpochMilli());
+            }
+        }
+
         return "login";
     }
 
